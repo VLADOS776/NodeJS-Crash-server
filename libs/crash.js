@@ -167,6 +167,8 @@ Crash.prototype.cashOut = function(user) {
 
 Crash.prototype.newBet = function(bet) {
     if (bet.bet > config.maxBet) bet.bet = config.maxBet;
+    if (this.gameStart) return;
+    
     this.bets[bet.id] = bet;
     this.bets[bet.id].status = 'regular';
     players.sendToAll(bet);
