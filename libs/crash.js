@@ -73,12 +73,15 @@ Crash.prototype.tick = function() {
         return false;
     }
     
-    players.sendToAll({
+    var msg = {
         server: true,
         type: 'tick',
-        number: this.currentMultiply,
-        cashOuts: this.cashOuts
-    })
+        number: this.currentMultiply
+    }
+    if (Object.keys(this.cashOuts).length != 0)
+        msg.cashOuts = this.cashOuts;
+    
+    players.sendToAll(msg)
     this.cashOuts = {};
     var that = this;
     tickTimeout = setTimeout(function () {that.tick()}, 300);

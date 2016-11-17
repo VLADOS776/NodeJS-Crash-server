@@ -52,7 +52,7 @@ function newClient(ws) {
                 }
                 break;
             case 'ping':
-                ws.send(JSON.stringify(PONG));
+                //ws.send(JSON.stringify(PONG));
                 break;
             default:
                 sendToAll(message);
