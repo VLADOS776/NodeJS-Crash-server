@@ -11,6 +11,9 @@ var Crash = function() {
     //Ставки
     this.bets = {};
     
+    //Новые ставки
+    this.cashOuts = {};
+    
     //Началась ли игра
     this.gameStart = false;
     
@@ -73,8 +76,10 @@ Crash.prototype.tick = function() {
     players.sendToAll({
         server: true,
         type: 'tick',
-        number: this.currentMultiply
+        number: this.currentMultiply,
+        cashOuts: this.cashOuts
     })
+    this.cashOuts = {};
     var that = this;
     tickTimeout = setTimeout(function () {that.tick()}, 300);
 }
@@ -153,13 +158,14 @@ Crash.prototype.cashOut = function(user) {
         var profit = Math.round(cash - this.bets[user.id].bet);
         console.log(`Cash: ${cash}, Profit: ${profit}`);
         this.bets[user.id].status = 'cashOut';
-        players.sendToAll({
+        /*players.sendToAll({
             server: true,
             type: 'cashOut',
             id: user.id,
             multiply: (this.currentMultiply/100),
             profit: profit
-        })
+        })*/
+        this.cashOuts[user.id] = profit;
     } catch (e) {
         return false;
     }
@@ -168,9 +174,10 @@ Crash.prototype.cashOut = function(user) {
 Crash.prototype.newBet = function(bet) {
     if (bet.bet > config.maxBet) bet.bet = config.maxBet;
     if (this.gameStart) return;
+    bet.status = 'regular';
     
     this.bets[bet.id] = bet;
-    this.bets[bet.id].status = 'regular';
+    //this.newBets.bet);
     players.sendToAll(bet);
 }
 
