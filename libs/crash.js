@@ -12,6 +12,9 @@ var Crash = function() {
     this.bets = {};
     
     //Новые ставки
+    this.newBets = {};
+    
+    //Игроки, которые выводят ставку
     this.cashOuts = {};
     
     //Началась ли игра
@@ -53,7 +56,7 @@ Crash.prototype.start = function() {
     this.gameStart = true;
     this.multiply = getRandomMultiply();
 
-    console.log('Crash multiply: '+this.multiply);
+    console.log('==== Crash at >>> '+this.multiply+' <<< ====');
     this.raiseMultiply();
     players.sendToAll({
         server: true,
@@ -97,11 +100,14 @@ Crash.prototype.raiseMultiply = function (speed) {
 }
 
 Crash.prototype.endGame = function() {
-    players.sendToAll({
+    var msg = {
         server: true,
         type: 'endGame',
         number: this.multiply
-    })
+    }
+    if (Object.keys(this.cashOuts).length != 0)
+        msg.cashOuts = this.cashOuts;
+    players.sendToAll(msg);
     
     for (var key in this.bets) {
         this.bets[key].status = this.bets[key].status == 'cashOut' ? 'cashOut' : 'crashed';
@@ -122,7 +128,6 @@ function getRandomMultiply() {
     }
     
     var limit = parseInt(getRandomItem(config.weights, weight));
-    console.log(`Limit: ${limit}`);
 
     if (limit == 0) return 0
 
@@ -138,7 +143,6 @@ var getRandomItem = function(list, weight) {
      
     var random_num = Math.rand(0, total_weight);
     var weight_sum = 0;
-    console.log(`RandomNum: ${random_num}`)
      
     var i = 0;
     for (var key in list) {
@@ -159,7 +163,6 @@ Crash.prototype.cashOut = function(user) {
     try {
         var cash = this.currentMultiply/100 * this.bets[user.id].bet;
         var profit = Math.round(cash - this.bets[user.id].bet);
-        console.log(`Cash: ${cash}, Profit: ${profit}`);
         this.bets[user.id].status = 'cashOut';
         /*players.sendToAll({
             server: true,
@@ -205,7 +208,6 @@ Crash.prototype.getStatus = function() {
 }
 
 Crash.prototype.timeToStart = function() {
-    console.log(`Next game: ${this.nextGame}`);
     return (this.nextGame - Date.now());
 }
 

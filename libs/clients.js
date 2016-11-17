@@ -38,7 +38,6 @@ function newClient(ws) {
     });
     
     function newMessage(message) {
-        console.log(message);
         var message = JSON.parse(message);
 
         switch (message.type) {
@@ -55,6 +54,7 @@ function newClient(ws) {
                 //ws.send(JSON.stringify(PONG));
                 break;
             default:
+                console.log(message);
                 sendToAll(message);
         }
     };
@@ -78,7 +78,8 @@ function onlineChanged() {
 function sendToAll(msg) {
     msg = JSON.stringify(msg);
     for (var key in clients) {
-        clients[key].send(msg);
+        if (clients[key])
+            clients[key].send(msg);
     }
 }
 
