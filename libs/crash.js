@@ -41,6 +41,7 @@ Crash.prototype.newGame = function() {
     this.nextGame = Date.now() + config.pauseBeforeGame;
     console.log(`New game start in ${this.nextGame}`);
     this.bets = {};
+    this.cashOuts = {};
     this.speed = config.startSpeed;
     this.currentMultiply = config.minMultiply;
     var that = this;
