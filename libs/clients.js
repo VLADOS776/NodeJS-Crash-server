@@ -78,7 +78,7 @@ function onlineChanged() {
 function sendToAll(msg) {
     msg = JSON.stringify(msg);
     for (var key in clients) {
-        if (clients[key])
+        if (clients[key].readyState == 1)
             clients[key].send(msg);
     }
 }
