@@ -1,5 +1,6 @@
 var config          = new require("./config");
 var players         = new require("./clients");
+var firebase        = new require('./firebaseDatabase');
 
 var tickTimeout = 0,
     raiseInterval = 0;
@@ -34,6 +35,11 @@ var Crash = function() {
     
     //Предыдущие множители
     this.history = [];
+    
+    //Top игроков в краш
+    this.top = {};
+    //Получаем топ игроков при запуске
+    getTop();
 }
 
 Crash.prototype.newGame = function() {
@@ -82,8 +88,25 @@ Crash.prototype.tick = function() {
         type: 'tick',
         number: this.currentMultiply
     }
-    if (Object.keys(this.cashOuts).length != 0)
+    if (Object.keys(this.cashOuts).length != 0) {
+        for (var key in this.cashOuts) {
+            var cash = this.currentMultiply/100 * this.bets[key].bet;
+            var profit = Math.round(cash - this.bets[key].bet);
+            
+            this.cashOuts[key] = profit;
+            
+            var checkT = checkTop(profit);
+            if (checkT != -1) {
+                   topUpdate(checkT, {
+                       bet: this.bets[key].bet,
+                       multiply: this.currentMultiply,
+                       player: this.bets[key].player,
+                       uid: key
+                   })
+            }
+        }
         msg.cashOuts = this.cashOuts;
+    }
     
     players.sendToAll(msg)
     this.cashOuts = {};
@@ -149,7 +172,7 @@ var getRandomItem = function(list, weight) {
     for (var key in list) {
         weight_sum += weight[i];
         weight_sum = +weight_sum.toFixed(2);
-         
+        
         if (random_num <= weight_sum) {
             return key;
         }
@@ -159,11 +182,62 @@ var getRandomItem = function(list, weight) {
     // end of function
 };
 
+function getTop() {
+    firebase.database().ref('top/crash').once('value').then(function (snapshot) {
+        Crash.top = snapshot.val();
+        Crash.top.oneGame = cleanArray(Crash.top.oneGame);
+    })
+    
+    var first = true;
+    firebase.database().ref('top/crash/update').on('value', function(data) {
+        if (first) {
+            first = false;
+        } else {
+            firebase.database().ref('top/crash/update').remove();
+            getTop();
+        }
+    })
+}
+
+function checkTop(profit) {
+    for (var i = 0; i < Crash.top.oneGame.length; i++) {
+    
+        if (profit > parseInt(parseInt(Crash.top.oneGame[i].bet) * parseInt(Crash.top.oneGame[i].multiply) / 100) - parseInt(Crash.top.oneGame[i].bet)) {
+            return i;
+        }
+    }
+    
+    //Если в топе игроков не хватает игроков, добавляем в конец
+    if (Crash.top.oneGame.length < config.topCount)
+        return i;
+    else
+        return -1;
+}
+
+function topUpdate(place, bet) {
+    Crash.top.oneGame.splice(place, 0, bet);
+    if (Crash.top.oneGame.length > config.topCount) {
+        Crash.top.oneGame.splice(Crash.top.oneGame.length - 1, 1);
+    }
+    Crash.top.oneGame = cleanArray(Crash.top.oneGame);
+    firebase.database().ref('top/crash/oneGame').set(Crash.top.oneGame);
+}
+
+function cleanArray(actual) {
+  var newArray = new Array();
+  for (var i = 0; i < actual.length; i++) {
+    if (actual[i]) {
+      newArray.push(actual[i]);
+    }
+  }
+  return newArray;
+}
+
 Crash.prototype.cashOut = function(user) {
-    if (typeof this.bets[user.id] == 'undefined') return false;
+    if (typeof this.bets[user.id] == 'undefined' || this.bets[user.id].status != 'regular') return false;
     try {
-        var cash = this.currentMultiply/100 * this.bets[user.id].bet;
-        var profit = Math.round(cash - this.bets[user.id].bet);
+        //var cash = this.currentMultiply/100 * this.bets[user.id].bet;
+        //var profit = Math.round(cash - this.bets[user.id].bet);
         this.bets[user.id].status = 'cashOut';
         /*players.sendToAll({
             server: true,
@@ -172,7 +246,8 @@ Crash.prototype.cashOut = function(user) {
             multiply: (this.currentMultiply/100),
             profit: profit
         })*/
-        this.cashOuts[user.id] = profit;
+        this.cashOuts[user.id] = true;
+        
     } catch (e) {
         return false;
     }

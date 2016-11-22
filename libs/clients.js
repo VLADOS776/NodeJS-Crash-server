@@ -67,10 +67,15 @@ function close(id) {
 };
 
 function onlineChanged() {
+    var onlineCount = 0;
+    for (var key in clients) {
+        if(clients[key].readyState == 1)
+            onlineCount++;
+    }
     var msg = {
         server: true,
         type: 'online',
-        online: Object.keys(clients).length
+        online: onlineCount
     }
     sendToAll(msg);
 }

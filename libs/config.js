@@ -5,7 +5,8 @@ var config = {
     pauseAfterCrash: 3000,
     startSpeed: 200,
     step: 1,
-    maxBet: 500000
+    maxBet: 500000,
+    topCount: 10
 }
 
 var weights = {
