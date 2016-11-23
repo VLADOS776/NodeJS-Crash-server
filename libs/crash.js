@@ -129,8 +129,25 @@ Crash.prototype.endGame = function() {
         type: 'endGame',
         number: this.multiply
     }
-    if (Object.keys(this.cashOuts).length != 0)
+    if (Object.keys(this.cashOuts).length != 0) {
+        for (var key in this.cashOuts) {
+            var cash = this.currentMultiply/100 * this.bets[key].bet;
+            var profit = Math.round(cash - this.bets[key].bet);
+            
+            this.cashOuts[key] = profit;
+            
+            var checkT = checkTop(profit);
+            if (checkT != -1) {
+                   topUpdate(checkT, {
+                       bet: this.bets[key].bet,
+                       multiply: this.currentMultiply,
+                       player: this.bets[key].player,
+                       uid: key
+                   })
+            }
+        }
         msg.cashOuts = this.cashOuts;
+    }
     players.sendToAll(msg);
     
     for (var key in this.bets) {
