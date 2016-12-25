@@ -7,7 +7,7 @@ var clients = {};
 var PONG = {type: 'pong'};
 
 function newClient(ws) {
-    var id = Math.random();
+    var id = Math.random().toString(36).slice(2);
     clients[id] = ws;
     
     var firstConnect = {
@@ -19,10 +19,6 @@ function newClient(ws) {
         multiply: Crash.multiply,
         bets: Crash.bets,
         history: Crash.history
-        /*lastGames: double.lastNumbers(),
-        rollTime: double.getNextRoll(),
-        rolling: double.status(),
-        bets: double.bets()*/
     }
     ws.send(JSON.stringify(firstConnect));
     
@@ -47,21 +43,25 @@ function newClient(ws) {
             case 'addBet':
                 if (!Crash.gameStart) {
                     Crash.newBet(message);
-                    //sendToAll(message);
                 }
                 break;
             case 'ping':
                 //ws.send(JSON.stringify(PONG));
                 break;
+            case 'message':
+                sendToAll(message);
             default:
                 console.log(message);
-                sendToAll(message);
         }
     };
 };
     
 function close(id) {
     console.log('Connection closed: ' + id);
+    try{
+        clients[id].destroy();
+    } catch(e){}
+    clients[id] = null;
     delete clients[id];
     onlineChanged();
 };

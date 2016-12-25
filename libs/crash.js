@@ -27,7 +27,7 @@ var Crash = function() {
     //Текущий множитель
     this.currentMultiply = 0;
     
-    //Когда сколько начнется игра
+    //Через сколько начнется игра
     this.nextGame = Date.now() + config.pauseBeforeGame;
     
     //Скорость обновления множителя
@@ -38,6 +38,7 @@ var Crash = function() {
     
     //Top игроков в краш
     this.top = {};
+    
     //Получаем топ игроков при запуске
     getTop();
 }
@@ -195,8 +196,6 @@ var getRandomItem = function(list, weight) {
         }
         i++;
     }
-     
-    // end of function
 };
 
 function getTop() {
@@ -253,16 +252,8 @@ function cleanArray(actual) {
 Crash.prototype.cashOut = function(user) {
     if (typeof this.bets[user.id] == 'undefined' || this.bets[user.id].status != 'regular') return false;
     try {
-        //var cash = this.currentMultiply/100 * this.bets[user.id].bet;
-        //var profit = Math.round(cash - this.bets[user.id].bet);
+
         this.bets[user.id].status = 'cashOut';
-        /*players.sendToAll({
-            server: true,
-            type: 'cashOut',
-            id: user.id,
-            multiply: (this.currentMultiply/100),
-            profit: profit
-        })*/
         this.cashOuts[user.id] = true;
         
     } catch (e) {
@@ -283,10 +274,6 @@ Crash.prototype.newBet = function(bet) {
 Crash.prototype.getCurrentMultiply = function() {
     return this.currentMultiply
 }
-
-/*function getMultiply() {
-    return multiply;
-}*/
 
 Crash.prototype.getSpeed = function() {
     return this.speed;
