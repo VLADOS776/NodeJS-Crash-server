@@ -74,7 +74,7 @@ Crash.prototype.start = function() {
     this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
     this.nextMultiply = null;
     
-    this.gameStartTime = new Date().getTime();
+    this.gameStartTime = Date.now();
 
     console.log('==== Crash at >>> '+this.multiply+' <<< ====');
     this.raiseMultiply();
@@ -99,7 +99,7 @@ Crash.prototype.tick = function() {
     var msg = {
         server: true,
         type: 'tick',
-        number: this.currentMultiply
+        number: this.currentMultiply.toFixed(0)
     }
     if (Object.keys(this.cashOuts).length != 0) {
         for (var key in this.cashOuts) {
@@ -112,7 +112,7 @@ Crash.prototype.tick = function() {
             if (checkT != -1) {
                    topUpdate(checkT, {
                        bet: this.bets[key].bet,
-                       multiply: this.currentMultiply,
+                       multiply: this.currentMultiply.toFixed(0),
                        player: this.bets[key].player,
                        uid: key
                    })
@@ -128,7 +128,7 @@ Crash.prototype.tick = function() {
 }
 
 Crash.prototype.raiseMultiply = function () {
-    var timeDiff = new Date().getTime() - this.gameStartTime;
+    var timeDiff = Date.now() - this.gameStartTime;
     var coef = 4e-2;
     if (timeDiff < 10000)
         coef = 7e-7;
