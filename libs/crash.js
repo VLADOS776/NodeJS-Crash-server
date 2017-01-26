@@ -129,7 +129,7 @@ Crash.prototype.tick = function() {
 
 Crash.prototype.raiseMultiply = function () {
     var timeDiff = new Date().getTime() - this.gameStartTime;
-    let coef = 4e-2;
+    var coef = 4e-2;
     if (timeDiff < 10000)
         coef = 7e-7;
     else if (timeDiff < 20000)
