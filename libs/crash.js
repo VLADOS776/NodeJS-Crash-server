@@ -21,6 +21,8 @@ var Crash = function() {
     //Началась ли игра
     this.gameStart = false;
     
+    this.gameStartTime = 0;
+    
     //Множитель, на котором закончится игра
     this.multiply = 0;
     
@@ -39,8 +41,15 @@ var Crash = function() {
     //Top игроков в краш
     this.top = {};
     
+    //Если есть, в следующей игре дойдет до этого значения
+    this.nextMultiply = null;
+    
     //Получаем топ игроков при запуске
     getTop();
+    
+    //Следим за бд
+    firebase.database().ref('games/crash/nextRound').remove();
+    this.checkNextVal();
 }
 
 Crash.prototype.newGame = function() {
@@ -62,7 +71,10 @@ Crash.prototype.newGame = function() {
 
 Crash.prototype.start = function() {
     this.gameStart = true;
-    this.multiply = getRandomMultiply();
+    this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
+    this.nextMultiply = null;
+    
+    this.gameStartTime = new Date().getTime();
 
     console.log('==== Crash at >>> '+this.multiply+' <<< ====');
     this.raiseMultiply();
@@ -115,13 +127,16 @@ Crash.prototype.tick = function() {
     tickTimeout = setTimeout(function () {that.tick()}, 300);
 }
 
-Crash.prototype.raiseMultiply = function (speed) {
-    this.speed = this.speed || 200;
-    this.speed -= Math.pow(this.speed, 2)*6e-5;
-    this.speed = this.speed < 2 ? 2 : this.speed;
-    this.currentMultiply += config.step;
+Crash.prototype.raiseMultiply = function () {
+    var timeDiff = new Date().getTime() - this.gameStartTime;
+    let coef = 4e-2;
+    if (timeDiff < 10000)
+        coef = 7e-7;
+    else if (timeDiff < 20000)
+        coef = 7e-3;
+    this.currentMultiply += Math.pow((timeDiff/1000), 2)*coef + 1;
     var that = this;
-    raiseInterval = setTimeout(function() {that.raiseMultiply(speed)}, this.speed);
+    raiseInterval = setTimeout(function() {that.raiseMultiply()}, 100);
 }
 
 Crash.prototype.endGame = function() {
@@ -161,6 +176,19 @@ Crash.prototype.endGame = function() {
     
     var that = this;
     setTimeout(function() {that.newGame()}, config.pauseAfterCrash);
+}
+
+Crash.prototype.checkNextVal = function() {
+    var first = true;
+    var that = this;
+    firebase.database().ref('games/crash/nextRound').on('value', function(data) {
+        if (first) {
+            first = false;
+        } else {
+            console.log('Next multiply is', data.val());
+            that.nextMultiply = parseFloat(data.val());
+        }
+    })
 }
 
 function getRandomMultiply() {

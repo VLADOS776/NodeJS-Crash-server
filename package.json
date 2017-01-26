@@ -1,6 +1,6 @@
 {
   "name": "nodejs-crash-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Crash server for Open Case",
   "main": "server.js",
   "dependencies": {
@@ -14,5 +14,9 @@
     "start": "node server.js"
   },
   "author": "VLADOS776",
-  "license": "ISC"
+  "license": "ISC",
+  "repository" : {
+      "type" : "git",
+      "url" : "https://github.com/VLADOS776/NodeJS-Crash-server.git"
+  }
 }
