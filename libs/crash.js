@@ -87,7 +87,7 @@ Crash.prototype.start = function() {
 }
 
 Crash.prototype.tick = function() {
-    if (this.currentMultiply >= this.multiply) {
+    if (this.currentMultiply >= this.multiply || this.currentMultiply >= 2000) {
         clearTimeout(tickTimeout);
         tickTimeout = 0;
         clearTimeout(raiseInterval);
