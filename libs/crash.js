@@ -71,7 +71,8 @@ Crash.prototype.newGame = function() {
 
 Crash.prototype.start = function() {
     this.gameStart = true;
-    this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
+    this.multiply = 51232;
+    //this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
     this.nextMultiply = null;
     
     this.gameStartTime = Date.now();
@@ -90,7 +91,7 @@ Crash.prototype.start = function() {
 }
 
 Crash.prototype.tick = function() {
-    if (this.currentMultiply >= this.multiply || this.currentMultiply >= 2000) {
+    if (this.currentMultiply >= this.multiply) {
         clearTimeout(tickTimeout);
         tickTimeout = 0;
         clearTimeout(raiseInterval);
@@ -132,11 +133,9 @@ Crash.prototype.tick = function() {
 
 Crash.prototype.raiseMultiply = function () {
     var timeDiff = Date.now() - this.gameStartTime;
-    var coef = 0.01;
-    if (timeDiff < 10000)
+    var coef = 7e-3;
+    if (this.currentMultiply < 200)
         coef = 7e-7;
-    else if (timeDiff < 20000)
-        coef = 7e-3;
     this.currentMultiply += Math.pow((timeDiff/1000), 2)*coef + 1;
     var that = this;
     raiseInterval = setTimeout(function() {that.raiseMultiply()}, 100);
