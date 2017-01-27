@@ -71,8 +71,8 @@ Crash.prototype.newGame = function() {
 
 Crash.prototype.start = function() {
     this.gameStart = true;
-    this.multiply = 51232;
-    //this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
+    //this.multiply = 51232;
+    this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
     this.nextMultiply = null;
     
     this.gameStartTime = Date.now();
