@@ -75,6 +75,9 @@ Crash.prototype.start = function() {
     this.nextMultiply = null;
     
     this.gameStartTime = Date.now();
+    
+    if (isNaN(this.multiply))
+        this.multiply = 351;
 
     console.log('==== Crash at >>> '+this.multiply+' <<< ====');
     this.raiseMultiply();
