@@ -284,6 +284,7 @@ Crash.prototype.cashOut = function(user) {
     try {
 
         this.bets[user.id].status = 'cashOut';
+        this.bets[user.id].multiply = this.currentMultiply.toFixed(0); // Send the multiply so that people that joined while the game was in progress will have it
         this.cashOuts[user.id] = true;
         
     } catch (e) {
