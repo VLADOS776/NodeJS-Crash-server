@@ -5,7 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.14.0",
-    "firebase": "^3.6.1",
+    "firebase-admin": "^4.1.0",
     "ws": "^1.1.1"
   },
   "devDependencies": {},
@@ -15,8 +15,8 @@
   },
   "author": "VLADOS776",
   "license": "ISC",
-  "repository" : {
-      "type" : "git",
-      "url" : "https://github.com/VLADOS776/NodeJS-Crash-server.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VLADOS776/NodeJS-Crash-server.git"
   }
 }
