@@ -71,7 +71,6 @@ Crash.prototype.newGame = function() {
 
 Crash.prototype.start = function() {
     this.gameStart = true;
-    //this.multiply = 51232;
     this.multiply = this.nextMultiply !== null ? this.nextMultiply : getRandomMultiply();
     this.nextMultiply = null;
     
@@ -189,6 +188,8 @@ Crash.prototype.checkNextVal = function() {
         } else {
             console.log('Next multiply is', data.val());
             that.nextMultiply = parseFloat(data.val());
+            if (isNaN(that.nextMultiply))
+                that.nextMultiply = null;
         }
     })
 }
@@ -282,11 +283,9 @@ function cleanArray(actual) {
 Crash.prototype.cashOut = function(user) {
     if (typeof this.bets[user.id] == 'undefined' || this.bets[user.id].status != 'regular') return false;
     try {
-
         this.bets[user.id].status = 'cashOut';
-        this.bets[user.id].multiply = this.currentMultiply.toFixed(0); // Send the multiply so that people that joined while the game was in progress will have it
+        this.bets[user.id].multiply = this.currentMultiply.toFixed(0);
         this.cashOuts[user.id] = true;
-        
     } catch (e) {
         return false;
     }
@@ -294,7 +293,9 @@ Crash.prototype.cashOut = function(user) {
 
 Crash.prototype.newBet = function(bet) {
     if (bet.bet > config.maxBet) bet.bet = config.maxBet;
-    if (this.gameStart) return;
+    if (this.gameStart || bet.bet <= 0) return;
+    if (typeof bet.id === 'undefined' || bet.id == '' || typeof this.bets[bet.id] !== 'undefined')
+        return;
     bet.status = 'regular';
     
     this.bets[bet.id] = bet;
@@ -329,13 +330,3 @@ Math.rand = function getRandomInt(min, max) {
 var crashGame = new Crash();
 
 module.exports = crashGame;
-
-
-/*module.exports.newGame      = newGame;
-module.exports.cashOut      = cashOut;
-module.exports.newBet       = newBet;
-module.exports.multiply     = getCurrentMultiply;
-module.exports.status       = getStatus;
-module.exports.speed        = getSpeed;
-module.exports.bets         = getBets;
-module.exports.timeToStart  = timeToStart;*/
