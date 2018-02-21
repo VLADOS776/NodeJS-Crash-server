@@ -1,6 +1,6 @@
 var config = {
     minMultiply: 100,
-    maxMultiply: 30000,
+    maxMultiply: 50000,
     pauseBeforeGame: 6000,
     pauseAfterCrash: 3000,
     startSpeed: 200,
@@ -14,12 +14,14 @@ var weights = {
     200:    50,
     300:    75,
     1000:   15,
-    2000:   10,
-    5000:   8,
-    7000:   5,
-    10000:  3,
-    20000:  2,
-    30000:  1
+    2000:   13,
+    5000:   10,
+    7000:   8,
+    10000:  6,
+    20000:  5,
+    30000:  3,
+    40000:  2,
+    50000:  1
 }
 
 config.weights = weights;
