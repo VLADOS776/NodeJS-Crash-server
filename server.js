@@ -19,5 +19,3 @@ wss.on('connection', function(ws) {
 
 //var Crash = new Crash();
 Crash.newGame();
-
-server.listen(port);
